@@ -8,7 +8,7 @@ export async function publishJSON<T>(
 ): Promise<void> {
   const serialized = Buffer.from(JSON.stringify(value));
 
-  const published = ch.publish(exchange, routingKey, serialized, {
+  ch.publish(exchange, routingKey, serialized, {
     contentType: 'application/json',
   });
 }

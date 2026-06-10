@@ -1,10 +1,7 @@
 import amqp, { type ConfirmChannel } from 'amqplib';
-import { publishJSON } from '../internal/pubsub/pubsub.js';
+import { publishJSON } from '../internal/pubsub/publish.js';
 import { ExchangePerilDirect, PauseKey } from '../internal/routing/routing.js';
-import {
-  type PlayingState,
-} from '../internal/gamelogic/gamestate.js';
-
+import type { PlayingState } from '../internal/gamelogic/gamestate.js';
 
 async function main() {
   const rabbitConnString = 'amqp://guest:guest@localhost:5672/';
