@@ -1,0 +1,14 @@
+import type { ConfirmChannel } from 'amqplib';
+
+export async function publishJSON<T>(
+  ch: ConfirmChannel,
+  exchange: string,
+  routingKey: string,
+  value: T,
+): Promise<void> {
+  const serialized = Buffer.from(JSON.stringify(value));
+
+  const published = ch.publish(exchange, routingKey, serialized, {
+    contentType: 'application/json',
+  });
+}
