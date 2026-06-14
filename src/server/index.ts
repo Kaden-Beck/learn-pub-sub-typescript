@@ -20,27 +20,28 @@ async function main() {
   while (true) {
     const words = await getInput();
 
-    if (words.length !== 0) {
-      const firstWord = words[0];
-      if (firstWord === 'pause') {
-        console.log('Sending a pause message... ');
+    if (words.length === 0) {
+      continue;
+    }
 
-        await publishJSON(confirm, ExchangePerilDirect, PauseKey, {
-          isPaused: true,
-        } as PlayingState);
-      } else if (firstWord === 'resume') {
-        console.log('Sending a resume message... ');
+    const command = words[0];
 
-        await publishJSON(confirm, ExchangePerilDirect, PauseKey, {
-          isPaused: false,
-        } as PlayingState);
-      } else if (firstWord === 'quit') {
-        console.log('Exiting...');
-        break;
-      } else {
-        console.log('Invalid input... Try again.');
-        continue;
-      }
+    if (command === 'pause') {
+      console.log('Sending a pause message... ');
+      await publishJSON(confirm, ExchangePerilDirect, PauseKey, {
+        isPaused: true,
+      });
+    } else if (command === 'resume') {
+      console.log('Sending a resume message... ');
+      await publishJSON(confirm, ExchangePerilDirect, PauseKey, {
+        isPaused: false,
+      });
+    } else if (command === 'quit') {
+      console.log('Exiting...');
+      break;
+    } else {
+      console.log('Invalid input... Try again.');
+      continue;
     }
   }
 
