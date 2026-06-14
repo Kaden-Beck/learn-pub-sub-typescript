@@ -1,8 +1,14 @@
 import amqp, { type ConfirmChannel } from 'amqplib';
 import { publishJSON } from '../internal/pubsub/publish.js';
-import { ExchangePerilDirect, PauseKey } from '../internal/routing/routing.js';
+import {
+  ExchangePerilDirect,
+  ExchangePerilTopic,
+  GameLogSlug,
+  PauseKey,
+} from '../internal/routing/routing.js';
 import type { PlayingState } from '../internal/gamelogic/gamestate.js';
 import { getInput, printServerHelp } from '../internal/gamelogic/gamelogic.js';
+import { declareAndBind, SimpleQueueType } from '../internal/pubsub/bind.js';
 
 async function main() {
   const rabbitConnString = 'amqp://guest:guest@localhost:5672/';
@@ -15,17 +21,24 @@ async function main() {
     isPaused: true,
   } as PlayingState);
 
+  const [channel, assertQueue] = await declareAndBind(
+    conn,
+    ExchangePerilTopic,
+    GameLogSlug,
+    `${GameLogSlug}.*`,
+    SimpleQueueType.Durable,
+  );
+
   printServerHelp();
 
   while (true) {
     const words = await getInput();
-
     if (words.length === 0) {
       continue;
     }
-
     const command = words[0];
 
+    // REPL Loop
     if (command === 'pause') {
       console.log('Sending a pause message... ');
       await publishJSON(confirm, ExchangePerilDirect, PauseKey, {
@@ -45,6 +58,7 @@ async function main() {
     }
   }
 
+  // Shutdown on kill
   ['SIGINT', 'SIGTERM'].forEach((signal) =>
     process.on(signal, async () => {
       try {
